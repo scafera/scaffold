@@ -77,52 +77,14 @@ final class ScaffoldPlugin implements PluginInterface, EventSubscriberInterface
         foreach ($localRepo->getPackages() as $package) {
             $extra = $package->getExtra();
             $packagePath = $vendorDir . '/' . $package->getName();
-
-            if (isset($extra['scafera-scaffold']['files'])) {
-                foreach ($extra['scafera-scaffold']['files'] as $logicalKey => $source) {
-                    $sourceFile = $packagePath . '/' . $source;
-
-                    if (!is_file($sourceFile)) {
-                        $this->io->write(sprintf(
-                            '  <warning>Source not found: %s (%s)</warning>',
-                            $source,
-                            $package->getName(),
-                        ));
-                        continue;
-                    }
-
-                    $fileMap[$logicalKey] = [
-                        'source' => $sourceFile,
-                        'package' => $package->getName(),
-                    ];
-                }
-            }
-
-            if (isset($extra['scafera-scaffold']['initial-files'])) {
-                foreach ($extra['scafera-scaffold']['initial-files'] as $target => $source) {
-                    $sourceFile = $packagePath . '/' . $source;
-
-                    if (!is_file($sourceFile)) {
-                        $this->io->write(sprintf(
-                            '  <warning>Source not found: %s (%s)</warning>',
-                            $source,
-                            $package->getName(),
-                        ));
-                        continue;
-                    }
-
-                    $initialFileMap[$target] = [
-                        'source' => $sourceFile,
-                        'package' => $package->getName(),
-                    ];
-                }
-            }
-
-            if (isset($extra['scafera-scaffold']['target-map'])) {
-                foreach ($extra['scafera-scaffold']['target-map'] as $logicalKey => $target) {
-                    $targetMap[$logicalKey] = $target;
-                }
-            }
+            $this->collectScaffoldDeclarations(
+                $extra,
+                $packagePath,
+                $package->getName(),
+                $fileMap,
+                $initialFileMap,
+                $targetMap,
+            );
         }
 
         ksort($fileMap);
@@ -260,6 +222,67 @@ final class ScaffoldPlugin implements PluginInterface, EventSubscriberInterface
         file_put_contents($localConfigFile, "env:\n    APP_SECRET: '$secret'\n    APP_DEBUG: '1'\n");
 
         $this->io->write('  <info>config/config.local.yaml</info> created with generated APP_SECRET');
+    }
+
+    /**
+     * @param array<string, mixed> $extra
+     * @param array<string, array{source: string, package: string}> $fileMap
+     * @param array<string, array{source: string, package: string}> $initialFileMap
+     * @param array<string, string> $targetMap
+     */
+    private function collectScaffoldDeclarations(
+        array $extra,
+        string $packagePath,
+        string $packageName,
+        array &$fileMap,
+        array &$initialFileMap,
+        array &$targetMap,
+    ): void {
+        if (isset($extra['scafera-scaffold']['files'])) {
+            foreach ($extra['scafera-scaffold']['files'] as $logicalKey => $source) {
+                $sourceFile = $packagePath . '/' . $source;
+
+                if (!is_file($sourceFile)) {
+                    $this->io->write(sprintf(
+                        '  <warning>Source not found: %s (%s)</warning>',
+                        $source,
+                        $packageName,
+                    ));
+                    continue;
+                }
+
+                $fileMap[$logicalKey] = [
+                    'source' => $sourceFile,
+                    'package' => $packageName,
+                ];
+            }
+        }
+
+        if (isset($extra['scafera-scaffold']['initial-files'])) {
+            foreach ($extra['scafera-scaffold']['initial-files'] as $target => $source) {
+                $sourceFile = $packagePath . '/' . $source;
+
+                if (!is_file($sourceFile)) {
+                    $this->io->write(sprintf(
+                        '  <warning>Source not found: %s (%s)</warning>',
+                        $source,
+                        $packageName,
+                    ));
+                    continue;
+                }
+
+                $initialFileMap[$target] = [
+                    'source' => $sourceFile,
+                    'package' => $packageName,
+                ];
+            }
+        }
+
+        if (isset($extra['scafera-scaffold']['target-map'])) {
+            foreach ($extra['scafera-scaffold']['target-map'] as $logicalKey => $target) {
+                $targetMap[$logicalKey] = $target;
+            }
+        }
     }
 
     /** @return array<string, true> */
