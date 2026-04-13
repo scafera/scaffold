@@ -3,6 +3,12 @@
     "description": "Composer plugin that scaffolds framework files into Scafera projects",
     "type": "composer-plugin",
     "license": "MIT",
+    "keywords": ["scafera", "composer-plugin", "scaffold", "php"],
+    "homepage": "https://github.com/scafera/scaffold",
+    "support": {
+        "issues": "https://github.com/scafera/scaffold/issues",
+        "source": "https://github.com/scafera/scaffold"
+    },
     "require": {
         "php": ">=8.4",
         "composer-plugin-api": "^2.0"
