@@ -1,4 +1,4 @@
-# Scafera Scaffold
+# scafera/scaffold
 
 Composer plugin that scaffolds framework-owned files into Scafera projects.
 
@@ -128,7 +128,14 @@ Scafera: scaffolding project files...
   .gitignore → .gitignore (from scafera/layered)
   config/config.example.yaml → config/config.example.yaml (from scafera/kernel)
   index.php → public/index.php (from scafera/kernel)
-  config/config.yaml (initial, from scafera/kernel)
-  Skipped: config/config.yaml (already exists)
-Scafera: 5 file(s) scaffolded.
+  Skipped: .gitignore (already exists)
+Scafera: 3 file(s) scaffolded.
 ```
+
+## Requirements
+
+- PHP >= 8.4
+
+## License
+
+MIT
