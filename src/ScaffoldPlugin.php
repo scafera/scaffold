@@ -35,6 +35,7 @@ final class ScaffoldPlugin implements PluginInterface, EventSubscriberInterface
         return [
             ScriptEvents::POST_INSTALL_CMD => 'scaffold',
             ScriptEvents::POST_UPDATE_CMD => 'scaffold',
+            ScriptEvents::POST_CREATE_PROJECT_CMD => 'onCreateProject',
         ];
     }
 
@@ -165,6 +166,23 @@ final class ScaffoldPlugin implements PluginInterface, EventSubscriberInterface
         }
 
         $this->io->write(sprintf('<info>Scafera: %d file(s) scaffolded.</info>', $scaffolded));
+    }
+
+    public function onCreateProject(Event $event): void
+    {
+        $templateName = $this->composer->getPackage()->getName();
+
+        $this->io->write('');
+        $this->io->write('  <bg=blue;fg=white>                                                           </>');
+        $this->io->write('  <bg=blue;fg=white>  Congratulations, you have installed the Scafera framework  </>');
+        $this->io->write(sprintf('  <bg=blue;fg=white>  from the %s template!%s</>', $templateName, str_repeat(' ', max(0, 37 - strlen($templateName)))));
+        $this->io->write('  <bg=blue;fg=white>                                                           </>');
+        $this->io->write('');
+        $this->io->write('  Next steps:');
+        $this->io->write('    * Run the validator:  <info>vendor/bin/scafera validate</info>');
+        $this->io->write('    * Start coding:       Create controllers in <info>src/Controller/</info>');
+        $this->io->write('    * Run tests:          <info>vendor/bin/phpunit</info>');
+        $this->io->write('');
     }
 
     /** @return array<string, true> */
