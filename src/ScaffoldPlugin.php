@@ -170,6 +170,8 @@ final class ScaffoldPlugin implements PluginInterface, EventSubscriberInterface
 
     public function onCreateProject(Event $event): void
     {
+        $this->generateConfigFiles();
+
         $templateName = $this->composer->getPackage()->getName();
 
         $this->io->write('');
@@ -183,6 +185,65 @@ final class ScaffoldPlugin implements PluginInterface, EventSubscriberInterface
         $this->io->write('    * Start coding:       Create controllers in <info>src/Controller/</info>');
         $this->io->write('    * Run tests:          <info>vendor/bin/phpunit</info>');
         $this->io->write('');
+    }
+
+    private function generateConfigFiles(): void
+    {
+        $projectDir = getcwd();
+        $configDir = $projectDir . '/config';
+
+        if (!is_dir($configDir)) {
+            mkdir($configDir, 0755, true);
+        }
+
+        $this->generateConfigYaml($configDir);
+        $this->generateLocalConfigYaml($configDir);
+    }
+
+    private function generateConfigYaml(string $configDir): void
+    {
+        $configFile = $configDir . '/config.yaml';
+
+        if (is_file($configFile)) {
+            return;
+        }
+
+        $vendorDir = $this->composer->getConfig()->get('vendor-dir');
+        $exampleFile = $vendorDir . '/scafera/kernel/support/scaffold/config/config.example.yaml';
+
+        if (!is_file($exampleFile)) {
+            return;
+        }
+
+        $lines = file($exampleFile, FILE_IGNORE_NEW_LINES);
+        $filtered = [];
+
+        foreach ($lines as $line) {
+            if (str_contains($line, '#local')) {
+                continue;
+            }
+
+            $filtered[] = $line;
+        }
+
+        file_put_contents($configFile, implode("\n", $filtered) . "\n");
+
+        $this->io->write('  <info>config/config.yaml</info> created');
+    }
+
+    private function generateLocalConfigYaml(string $configDir): void
+    {
+        $localConfigFile = $configDir . '/config.local.yaml';
+
+        if (is_file($localConfigFile)) {
+            return;
+        }
+
+        $secret = bin2hex(random_bytes(16));
+
+        file_put_contents($localConfigFile, "env:\n    APP_SECRET: '$secret'\n    APP_DEBUG: '1'\n");
+
+        $this->io->write('  <info>config/config.local.yaml</info> created with generated APP_SECRET');
     }
 
     /** @return array<string, true> */
