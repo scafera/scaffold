@@ -44,6 +44,22 @@ final class ScaffoldPlugin implements PluginInterface, EventSubscriberInterface
         $this->io->write('<info>Scafera: scaffolding project files...</info>');
 
         $projectDir = getcwd();
+
+        // Pre-create runtime dirs — InstalledPackages::writeCache() runs before
+        // Symfony's cache warmup, so var/cache/ must exist at first boot.
+        foreach (['var/cache', 'var/log'] as $dir) {
+            $path = $projectDir . '/' . $dir;
+            if (!is_dir($path) && !@mkdir($path, 0755, true) && !is_dir($path)) {
+                $this->io->writeError(sprintf(
+                    '  <error>Scafera: unable to create "%s" — check directory permissions for "%s"</error>',
+                    $dir,
+                    $projectDir,
+                ));
+
+                return;
+            }
+        }
+
         $vendorDir = $this->composer->getConfig()->get('vendor-dir');
         $disabledFiles = $this->getDisabledFiles();
 
