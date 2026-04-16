@@ -1,5 +1,13 @@
 # scafera/scaffold
 
+> **This is not a code generator.** It does not create controllers, services,
+> or commands for you — for that, use `vendor/bin/scafera make:controller`,
+> `make:service`, `make:command` (provided by architecture packages such as
+> `scafera/layered`). This plugin is a Composer hook that copies
+> framework-owned files (entry point, kernel bootstrap, `.gitignore`, config
+> examples) into your project on `composer install` so the framework and your
+> project stay in sync.
+
 Composer plugin that scaffolds framework-owned files into Scafera projects.
 
 Runs automatically on `composer install` and `composer update`. Scaffolded files are always overwritten to prevent drift between framework and project.
