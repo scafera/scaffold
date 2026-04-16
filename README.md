@@ -1,16 +1,19 @@
 # scafera/scaffold
 
-> **This is not a code generator.** It does not create controllers, services,
-> or commands for you — for that, use `vendor/bin/scafera make:controller`,
-> `make:service`, `make:command` (provided by architecture packages such as
-> `scafera/layered`). This plugin is a Composer hook that copies
-> framework-owned files (entry point, kernel bootstrap, `.gitignore`, config
-> examples) into your project on `composer install` so the framework and your
-> project stay in sync.
-
 Composer plugin that scaffolds framework-owned files into Scafera projects.
 
-Runs automatically on `composer install` and `composer update`. Scaffolded files are always overwritten to prevent drift between framework and project.
+> **Provides:** Composer plugin that copies framework-owned files (entry point, kernel bootstrap, `.gitignore`, config examples) into Scafera projects on `composer install`/`update`. Files are always overwritten (except `initial-files`, copied once) to keep framework and project in sync.
+>
+> **Depends on:** Composer 2+ (`composer-plugin-api ^2.0`). Activates automatically for any installed package that declares `extra.scafera-scaffold`.
+>
+> **Extension points:**
+> - `composer.json` → `extra.scafera-scaffold.files` — logical keys mapped to source paths in the declaring package; always overwritten on install
+> - `extra.scafera-scaffold.initial-files` — literal target paths; copied once, never overwritten (intended for user-editable configs)
+> - `extra.scafera-scaffold.target-map` — architecture packages remap logical keys to project-specific paths (e.g. `index.php` → `public/index.php`)
+> - `extra.scafera-scaffold.file-mapping` — project-level opt-out (`"public/index.php": false` to disable a scaffolded file)
+> - Convention — package-side scaffold sources live under `support/scaffold/` at the package root
+>
+> **Not responsible for:** Code generation (use `scafera make:controller`, `make:service`, `make:command` from the architecture package — e.g. `scafera/layered`) · application scaffolding (only framework-owned files are copied) · modifying user-authored code · conflict resolution beyond last-package-wins for duplicate logical keys.
 
 ## How It Works
 
